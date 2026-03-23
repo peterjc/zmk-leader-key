@@ -22,7 +22,7 @@
 #include <zmk/hid.h>
 #include <zmk/matrix.h>
 #include <zmk/keymap.h>
-#include <zmk/behaviors.dtsi>
+#include <zmk/dts/behaviors/key_press.dtsi>
 #include <zmk/dt-bindings/zmk/keys.h>
 
 #include <zmk-leader-key/keys.h>
