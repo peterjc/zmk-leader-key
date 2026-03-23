@@ -63,6 +63,21 @@ static struct leader_seq_cfg *completed_sequence;
 // Keep track of pressed keys so we can handle their release events.
 static struct zmk_key_param leader_pressed_keys[CONFIG_ZMK_LEADER_MAX_KEYS_PER_SEQUENCE];
 
+static inline int press_default_behavior(struct leader_seq_cfg *sequence, int32_t timestamp) {
+    LOG_DBG("Pressing leader default");
+    struct zmk_behavior_binding_event event = {
+        // Assign unique virtual key position to each sequence to work along hold-taps.
+        .position = sequence->virtual_key_position,
+#if IS_ENABLED(CONFIG_ZMK_SPLIT)
+        .source = source,
+#endif
+        .timestamp = timestamp,
+    };
+
+    sequence->is_pressed = true;
+    return zmk_behavior_invoke_binding(&kp COMMA, event, true);
+}
+
 static inline int press_leader_behavior(struct leader_seq_cfg *sequence, int32_t timestamp) {
     LOG_DBG("Pressing leader binding");
     struct zmk_behavior_binding_event event = {
@@ -231,6 +246,7 @@ static int leader_keycode_state_changed_listener(const zmk_event_t *eh) {
             return ZMK_EV_EVENT_HANDLED;
         } else {
             deactivate_leader_key();
+            press_default_behavior(completed_sequence, ev->timestamp)
             return ZMK_EV_EVENT_BUBBLE;
         }
     }
